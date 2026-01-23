@@ -1,0 +1,28 @@
+{
+  "name": "demo-backend",
+  "version": "1.0.0",
+  "description": "Demo backend application showing securify-logs library in action",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "generate-traffic": "node traffic-generator.js",
+    "create-user": "cd ../securify-logs && node scripts/createUser.js"
+  },
+  "keywords": [
+    "securify-logs",
+    "demo",
+    "security",
+    "monitoring"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "dotenv": "^16.0.3",
+    "securify-logs": "file:../securify-logs"
+  },
+  "devDependencies": {
+    "axios": "^1.6.0"
+  }
+}

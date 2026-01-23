@@ -1,0 +1,39 @@
+{
+  "name": "securify-logs",
+  "version": "1.0.0",
+  "description": "A comprehensive security monitoring middleware for Node.js applications with dashboard, threat detection, and vulnerability scanning",
+  "main": "src/index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "create-user": "node scripts/createUser.js"
+  },
+  "keywords": [
+    "security",
+    "monitoring",
+    "middleware",
+    "express",
+    "vulnerability",
+    "logging",
+    "dashboard"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.1.5",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.12"
+  }
+}
