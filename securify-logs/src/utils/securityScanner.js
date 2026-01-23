@@ -179,14 +179,19 @@ async function runFullScan(target) {
   const allFindings = [];
 
   try {
-    const [portFindings, sqlFindings, xssFindings, traversalFindings, headerFindings] =
-      await Promise.all([
-        scanPorts(target),
-        testSQLInjection(target),
-        testXSS(target),
-        testDirectoryTraversal(target),
-        checkSecurityHeaders(target),
-      ]);
+    const [
+      portFindings,
+      sqlFindings,
+      xssFindings,
+      traversalFindings,
+      headerFindings,
+    ] = await Promise.all([
+      scanPorts(target),
+      testSQLInjection(target),
+      testXSS(target),
+      testDirectoryTraversal(target),
+      checkSecurityHeaders(target),
+    ]);
 
     allFindings.push(
       ...portFindings,

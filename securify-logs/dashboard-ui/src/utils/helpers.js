@@ -9,21 +9,21 @@ export const formatDuration = (ms) => {
 
 export const getSeverityColor = (severity) => {
   const colors = {
-    critical: 'danger',
-    high: 'danger',
-    medium: 'warning',
-    low: 'info',
-    info: 'info'
+    critical: "danger",
+    high: "danger",
+    medium: "warning",
+    low: "info",
+    info: "info",
   };
-  return colors[severity] || 'info';
+  return colors[severity] || "info";
 };
 
 export const getStatusBadge = (status) => {
   const badges = {
-    completed: 'success',
-    running: 'warning',
-    pending: 'info',
-    failed: 'danger'
+    completed: "success",
+    running: "warning",
+    pending: "info",
+    failed: "danger",
   };
-  return badges[status] || 'info';
+  return badges[status] || "info";
 };

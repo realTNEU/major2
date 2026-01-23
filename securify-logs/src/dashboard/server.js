@@ -379,13 +379,10 @@ function startDashboard(config) {
   // Start server
   app.listen(port, "0.0.0.0", () => {
     console.log(`[SecurifyLogs] Dashboard listening on port ${port}`);
-    console.log(
-      `[SecurifyLogs] Access dashboard at: http://localhost:${port}`
-    );
+    console.log(`[SecurifyLogs] Access dashboard at: http://localhost:${port}`);
   });
 
   return app;
 }
 
 module.exports = startDashboard;
-

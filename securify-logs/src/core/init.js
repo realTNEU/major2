@@ -13,7 +13,10 @@ async function init(userConfig) {
     ...defaultConfig,
     ...userConfig,
     dashboard: { ...defaultConfig.dashboard, ...userConfig.dashboard },
-    securityScans: { ...defaultConfig.securityScans, ...userConfig.securityScans }
+    securityScans: {
+      ...defaultConfig.securityScans,
+      ...userConfig.securityScans,
+    },
   };
 
   // Validate configuration
@@ -31,7 +34,7 @@ async function init(userConfig) {
   if (config.dashboard?.enabled) {
     const dashboardConfig = {
       port: config.dashboard.port,
-      jwtSecret: config.jwtSecret
+      jwtSecret: config.jwtSecret,
     };
     startDashboard(dashboardConfig);
   }
@@ -47,7 +50,7 @@ async function init(userConfig) {
     config,
     stop: async () => {
       console.log("[SecurifyLogs] Shutting down...");
-    }
+    },
   };
 }
 

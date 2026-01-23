@@ -20,7 +20,9 @@ function validateConfig(config) {
   }
 
   if (config.securityScans?.enabled && !config.securityScans.target) {
-    console.warn("[SecurifyLogs] Security scans enabled but no target specified");
+    console.warn(
+      "[SecurifyLogs] Security scans enabled but no target specified"
+    );
   }
 
   return true;
@@ -32,22 +34,21 @@ function validateConfig(config) {
 const defaultConfig = {
   app: null,
   mongoUri: null,
-  jwtSecret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+  jwtSecret: process.env.JWT_SECRET || "your-secret-key-change-in-production",
   dashboard: {
     enabled: true,
-    port: 9000
+    port: 9000,
   },
   securityScans: {
     enabled: true,
-    target: 'localhost',
+    target: "localhost",
     schedules: {
-      full: '0 2 * * *',        // Daily at 2 AM
-      port_scan: '0 */6 * * *', // Every 6 hours
-      sql_injection: '0 4 * * *', // Daily at 4 AM
-      xss: '0 5 * * *'           // Daily at 5 AM
-    }
-  }
+      full: "0 2 * * *", // Daily at 2 AM
+      port_scan: "0 */6 * * *", // Every 6 hours
+      sql_injection: "0 4 * * *", // Daily at 4 AM
+      xss: "0 5 * * *", // Daily at 5 AM
+    },
+  },
 };
 
 module.exports = { validateConfig, defaultConfig };
-

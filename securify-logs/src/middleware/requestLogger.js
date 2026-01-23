@@ -45,7 +45,9 @@ module.exports = (config) => {
         // Log suspicious activity to console
         if (log.suspicious) {
           console.warn(
-            `[SecurifyLogs] Suspicious request detected: ${req.method} ${req.originalUrl} from ${req.ip} - Flags: ${log.flags.join(", ")}`
+            `[SecurifyLogs] Suspicious request detected: ${req.method} ${
+              req.originalUrl
+            } from ${req.ip} - Flags: ${log.flags.join(", ")}`
           );
         }
       } catch (error) {
@@ -56,4 +58,3 @@ module.exports = (config) => {
     next();
   };
 };
-

@@ -15,9 +15,7 @@ let cronJobs = [];
  * Execute a security scan
  */
 async function executeScan(scanType, target) {
-  console.log(
-    `[CronScanner] Starting ${scanType} scan for ${target}...`
-  );
+  console.log(`[CronScanner] Starting ${scanType} scan for ${target}...`);
 
   const scan = await VulnerabilityScan.create({
     scanType,
@@ -97,10 +95,7 @@ function scheduleScan(schedule, scanType, target) {
       try {
         await executeScan(scanType, target);
       } catch (error) {
-        console.error(
-          `[CronScanner] Scheduled scan error:`,
-          error.message
-        );
+        console.error(`[CronScanner] Scheduled scan error:`, error.message);
       }
     },
     {
@@ -129,9 +124,7 @@ function initializeScans(config) {
   const { target, schedules } = config.securityScans;
 
   if (!target) {
-    console.warn(
-      "[CronScanner] No target specified for security scans"
-    );
+    console.warn("[CronScanner] No target specified for security scans");
     return;
   }
 
@@ -156,9 +149,7 @@ function initializeScans(config) {
     }
   });
 
-  console.log(
-    `[CronScanner] Initialized ${cronJobs.length} scheduled scans`
-  );
+  console.log(`[CronScanner] Initialized ${cronJobs.length} scheduled scans`);
 }
 
 /**

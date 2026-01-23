@@ -7,8 +7,7 @@ function authenticateToken(jwtSecret) {
   return (req, res, next) => {
     // Get token from cookie or Authorization header
     const token =
-      req.cookies?.token ||
-      req.headers.authorization?.replace("Bearer ", "");
+      req.cookies?.token || req.headers.authorization?.replace("Bearer ", "");
 
     if (!token) {
       return res.status(401).json({

@@ -58,7 +58,7 @@ module.exports = function detectPatterns(req) {
   // Path Traversal patterns
   const pathTraversalPatterns = [
     /\.\.\//,
-    /\.\.\\/, 
+    /\.\.\\/,
     /%2e%2e%2f/i,
     /%2e%2e\\/i,
     /\.\.\%2f/i,
@@ -108,4 +108,3 @@ module.exports = function detectPatterns(req) {
 
   return flags;
 };
-
