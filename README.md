@@ -1,6 +1,6 @@
 # SecurifyLogs - Complete Project
 
-A production-ready **Node.js security monitoring library** with real-time threat detection, vulnerability scanning, and an elegant dashboard for tracking API security.
+A production-raedy **Node.js security monitoring library** with real-time threat detection, vulnerability scanning, and an elegant dashboard for tracking API security.
 
 ```
 .
