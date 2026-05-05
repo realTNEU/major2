@@ -1,73 +1,57 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import './Login.css';
+import { useNavigate } from 'react-router-dom';
+import { ShieldAlert } from 'lucide-react';
 
-export const Login = ({ onLoginSuccess }) => {
+export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
 
     try {
-      await login(username, password);
-      onLoginSuccess();
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        navigate('/');
+      } else {
+        setError(data.error);
+      }
     } catch (err) {
-      setError(err.message || 'Login failed');
-    } finally {
-      setLoading(false);
+      setError('Connection failed. Is the server running?');
     }
   };
 
   return (
     <div className="login-container">
-      <div className="login-card">
-        <h1 className="login-title">🔒 SecurifyLogs</h1>
-        <p className="login-subtitle">Security Monitoring Dashboard</p>
-
-        <form onSubmit={handleSubmit} className="login-form">
-          {error && <div className="error-message">{error}</div>}
-
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
-              disabled={loading}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              disabled={loading}
-              required
-            />
-          </div>
-
-          <button type="submit" disabled={loading} className="login-btn">
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-
-        <div className="login-footer">
-          <p>Secure access only</p>
+      <div className="card login-card">
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <ShieldAlert size={48} color="var(--accent)" />
+          <h2 style={{ marginTop: '10px' }}>Admin Access</h2>
         </div>
+        
+        {error && <div style={{ color: 'var(--danger)', marginBottom: '15px', textAlign: 'center' }}>{error}</div>}
+
+        <form onSubmit={handleLogin}>
+          <div>
+            <label>Username</label>
+            <input type="text" value={username} onChange={e => setUsername(e.target.value)} required />
+          </div>
+          <div>
+            <label>Password</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+          </div>
+          <button type="submit" style={{ width: '100%' }}>Login</button>
+        </form>
       </div>
     </div>
   );
-};
+}

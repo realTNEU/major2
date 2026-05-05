@@ -1,140 +1,120 @@
-import React, { useState, useEffect } from 'react';
-import { formatDate, formatDuration } from '../utils/helpers';
-import './Dashboard.css';
+import React, { useEffect, useState } from 'react';
+import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Activity, ShieldAlert, LayoutDashboard } from 'lucide-react';
 
-export const Dashboard = () => {
-  const [stats, setStats] = useState(null);
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    suspicious: '',
-    method: '',
-    page: 1
-  });
+const COLORS = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6'];
 
-  useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 5000); // Refresh every 5 seconds
-    return () => clearInterval(interval);
-  }, [filters]);
+export default function Dashboard() {
+  const [stats, setStats] = useState({ totalRequests: 0, totalThreats: 0, pieData: [] });
+  const [lineData, setLineData] = useState([]);
 
   const fetchData = async () => {
     try {
-      const [statsRes, logsRes] = await Promise.all([
-        fetch('/api/stats', { credentials: 'include' }),
-        fetch(`/api/logs?page=${filters.page}&suspicious=${filters.suspicious}&method=${filters.method}`, { credentials: 'include' })
-      ]);
+      const statsRes = await fetch('/api/stats');
+      if (statsRes.ok) setStats(await statsRes.json());
 
-      if (statsRes.ok) {
-        setStats(await statsRes.json());
-      }
+      const logsRes = await fetch('/api/logs');
       if (logsRes.ok) {
-        setLogs(await logsRes.json());
+        const logs = await logsRes.json();
+        
+        // Compute line chart data (requests per minute)
+        const timeMap = {};
+        logs.forEach(log => {
+          // Format as HH:mm
+          const date = new Date(log.timestamp);
+          const timeStr = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${Math.floor(date.getSeconds() / 10) * 10}`; // Group by 10 seconds
+          timeMap[timeStr] = (timeMap[timeStr] || 0) + 1;
+        });
+
+        const sortedTimes = Object.keys(timeMap).sort();
+        const formattedLineData = sortedTimes.map(time => ({
+          time,
+          requests: timeMap[time]
+        }));
+        setLineData(formattedLineData.slice(-20)); // Keep last 20 periods
       }
-    } catch (error) {
-      console.error('Failed to fetch data:', error);
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  if (loading) {
-    return <div className="loading"><div className="spinner"></div></div>;
-  }
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="dashboard">
-      <h2>Dashboard</h2>
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+        <LayoutDashboard size={28} color="var(--accent)" />
+        <h1 style={{ margin: 0 }}>Security Analytics Overview</h1>
+      </div>
 
-      {/* Overview Cards */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-label">Total Requests</div>
-          <div className="stat-value">{stats?.overview.totalRequests}</div>
+      <div className="grid-2" style={{ marginBottom: '20px' }}>
+        <div className="card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Activity color="var(--accent)" />
+            <h3>Total Requests Intercepted</h3>
+          </div>
+          <p style={{ fontSize: '3rem', margin: '10px 0 0 0', fontWeight: 'bold' }}>{stats.totalRequests}</p>
         </div>
-        <div className="stat-card alert">
-          <div className="stat-label">Suspicious Requests</div>
-          <div className="stat-value">{stats?.overview.suspiciousRequests}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Threat Rate</div>
-          <div className="stat-value">{stats?.overview.threatRate}%</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Requests (24h)</div>
-          <div className="stat-value">{stats?.overview.requests24h}</div>
+        <div className="card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <ShieldAlert color="var(--danger)" />
+            <h3>High-Risk Threats Detected</h3>
+          </div>
+          <p style={{ fontSize: '3rem', margin: '10px 0 0 0', fontWeight: 'bold', color: 'var(--danger)' }}>{stats.totalThreats}</p>
         </div>
       </div>
 
-      {/* Logs Section */}
-      <div className="logs-section">
-        <h3>Request Logs</h3>
-
-        <div className="filters">
-          <select
-            value={filters.method}
-            onChange={(e) => setFilters({ ...filters, method: e.target.value, page: 1 })}
-          >
-            <option value="">All Methods</option>
-            <option value="GET">GET</option>
-            <option value="POST">POST</option>
-            <option value="PUT">PUT</option>
-            <option value="DELETE">DELETE</option>
-            <option value="PATCH">PATCH</option>
-          </select>
-
-          <select
-            value={filters.suspicious}
-            onChange={(e) => setFilters({ ...filters, suspicious: e.target.value, page: 1 })}
-          >
-            <option value="">All Requests</option>
-            <option value="true">Suspicious Only</option>
-          </select>
+      <div className="grid-2" style={{ marginBottom: '20px' }}>
+        <div className="card" style={{ height: '400px' }}>
+          <h3>Threat Distribution Profile</h3>
+          {stats.pieData && stats.pieData.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie 
+                  data={stats.pieData} 
+                  innerRadius={60} 
+                  outerRadius={100} 
+                  paddingAngle={5} 
+                  dataKey="value"
+                >
+                  {stats.pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <RechartsTooltip />
+                <Legend verticalAlign="bottom" height={36}/>
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+              No threats detected yet.
+            </div>
+          )}
         </div>
 
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>Method</th>
-                <th>Path</th>
-                <th>IP</th>
-                <th>Status</th>
-                <th>Duration</th>
-                <th>Flags</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.logs?.map((log) => (
-                <tr key={log._id} className={log.suspicious ? 'suspicious' : ''}>
-                  <td>{formatDate(log.createdAt)}</td>
-                  <td><span className="method-badge">{log.method}</span></td>
-                  <td className="path-cell">{log.path}</td>
-                  <td>{log.ip}</td>
-                  <td>
-                    <span className={`status-badge status-${log.statusCode}`}>
-                      {log.statusCode}
-                    </span>
-                  </td>
-                  <td>{formatDuration(log.duration)}</td>
-                  <td>
-                    {log.flags.length > 0 ? (
-                      <div className="flags">
-                        {log.flags.map((flag) => (
-                          <span key={flag} className="flag-badge">{flag}</span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-muted">—</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="card" style={{ height: '400px' }}>
+          <h3>Traffic Volume Over Time</h3>
+          {lineData.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={lineData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                <XAxis dataKey="time" stroke="#94a3b8" tick={{ fill: '#94a3b8' }} />
+                <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8' }} />
+                <RechartsTooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }} />
+                <Line type="monotone" dataKey="requests" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 8 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+              Awaiting traffic...
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
-};
+}
