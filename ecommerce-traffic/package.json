@@ -1,0 +1,13 @@
+{
+  "name": "ecommerce-traffic",
+  "version": "1.0.0",
+  "description": "Realistic traffic generator for dummy-ecommerce",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.0",
+    "node-fetch": "^2.6.9"
+  }
+}
